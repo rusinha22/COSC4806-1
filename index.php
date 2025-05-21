@@ -3,7 +3,7 @@
 session_start();
 
 //check if the user is authenticated
-// if not , send them to lohgin.php... headr()...
+// if not , send them to login.php... header()...
 ?>
 
 <!DOCTYPE html>
@@ -20,4 +20,8 @@ session_start();
 
 
 </body>
+
+   <footer>
+     <p><a href="/logout.php"> Click here to logout </a></p>
+   </footer>
 </html>
