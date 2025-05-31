@@ -1,28 +1,30 @@
 <?php
+session_start();
+require_once 'database.php';
 
-  session_start();
+if ($_SERVER["REQUEST_METHOD"] !== "POST" || !isset($_POST['username']) || !isset($_POST['password'])) {
+header("Location: login.php");
+exit;
+}
+$username = $_POST['username'];
+$password = $_POST['password'];
 
-  $valid_username = "mike";
-  $valid_password = "password";
+$db = db_connection();
+$stmt = $db->prepare("SELECT * FROM users WHERE username = ?");
+$stmt->execute([$username]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  $username = $_REQUEST['username'];
-  $_SESSION['username'] = $username;  
-  $password = $_REQUEST['password'];
-
-  if ($valid_username == $username && $valid_password == $password) {
-    $_SESSION['authenticated'] = 1;
-    header ('location: /');
-  } else {
-
-    if (!isset($_SESSION['failed_attempts'])){
-      $_SESSION['failed_attempts'] = 1;
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['authenticated'] = true;
+    $_SESSION['username'] = $username;
+    header('Location: index.php');
+} else {
+    if (!isset($_SESSION['failed_attempts'])) {
+        $_SESSION['failed_attempts'] = 1;
     } else {
-      $_SESSION['failed_attempts'] = $_SESSION['failed_attempts'] + 1;
+        $_SESSION['failed_attempts']++;
     }
 
-    // header... redirect to login.php
-    echo "this is unsuccessful attempt number " . $_SESSION['failed_attempts'];
-
-  }
-
+    echo "This is unsuccessful attempt number " . $_SESSION['failed_attempts'];
+}
 ?>
